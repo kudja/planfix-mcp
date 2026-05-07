@@ -2,9 +2,13 @@ const TIMEOUT = 15_000;
 const MAX_RETRIES = 3;
 
 function getBaseUrl(): string {
+  const baseUrl = process.env.PLANFIX_BASE_URL;
+  if (baseUrl) return baseUrl.replace(/\/+$/, "");
+
   const account = process.env.PLANFIX_ACCOUNT;
   if (account) {
-    return `https://${account}.planfix.com/rest`;
+    const domain = process.env.PLANFIX_DOMAIN ?? "planfix.com";
+    return `https://${account}.${domain}/rest`;
   }
   return "https://api.planfix.com/rest";
 }
@@ -47,7 +51,7 @@ export async function planfixRequest(
         options.body = JSON.stringify(body);
       }
 
-      const url = `${baseUrl}/${endpoint}`.replace(/\/+$/, "");
+      const url = `${baseUrl}/${endpoint.replace(/^\/+/, "")}`;
       const response = await fetch(url, options);
       clearTimeout(timer);
 

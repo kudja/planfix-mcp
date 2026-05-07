@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { planfixPost, planfixGet } from "../client.js";
 
+const DEFAULT_TASK_FIELDS =
+  "name,description,status,project,assigner,assignees,participants,dateTime,customData";
+
 export const getTasksSchema = z.object({
   offset: z.number().optional().describe("Смещение для пагинации (по умолчанию 0)"),
   pageSize: z.number().optional().describe("Количество задач на странице (по умолчанию 100)"),
@@ -18,10 +21,12 @@ export async function handleGetTasks(params: z.infer<typeof getTasksSchema>): Pr
 
 export const getTaskSchema = z.object({
   taskId: z.number().describe("ID задачи"),
+  fields: z.string().optional().describe("Поля задачи через запятую"),
 });
 
 export async function handleGetTask(params: z.infer<typeof getTaskSchema>): Promise<string> {
-  const result = await planfixGet(`task/${params.taskId}`);
+  const fields = encodeURIComponent(params.fields ?? DEFAULT_TASK_FIELDS);
+  const result = await planfixGet(`task/${params.taskId}?fields=${fields}`);
   return JSON.stringify(result, null, 2);
 }
 

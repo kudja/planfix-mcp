@@ -9,6 +9,20 @@ import { getTasksSchema, handleGetTasks, getTaskSchema, handleGetTask, createTas
 import { getContactsSchema, handleGetContacts, getContactSchema, handleGetContact } from "./tools/contacts.js";
 import { getProjectsSchema, handleGetProjects, getProjectSchema, handleGetProject } from "./tools/projects.js";
 import { getCommentsSchema, handleGetComments, addCommentSchema, handleAddComment } from "./tools/comments.js";
+import {
+  getDataTagsSchema,
+  handleGetDataTags,
+  getDataTagSchema,
+  handleGetDataTag,
+  getDataTagFieldsSchema,
+  handleGetDataTagFields,
+  getDataTagEntrySchema,
+  handleGetDataTagEntry,
+  getDataTagEntriesSchema,
+  handleGetDataTagEntries,
+  getTaskActualWorkTimeSchema,
+  handleGetTaskActualWorkTime,
+} from "./tools/datatags.js";
 import { skillMyTasks, skillCreateTask } from "./skills.js";
 
 const VERSION = "1.1.0";
@@ -89,6 +103,48 @@ export function createPlanfixServer(): McpServer {
     async (params) => ({ content: [{ type: "text", text: await handleAddComment(params) }] }),
   );
 
+  server.tool(
+    "get_data_tags",
+    "Получить список аналитик Planfix с пагинацией.",
+    getDataTagsSchema.shape,
+    async (params) => ({ content: [{ type: "text", text: await handleGetDataTags(params) }] }),
+  );
+
+  server.tool(
+    "get_data_tag",
+    "Получить одну аналитику Planfix по ID.",
+    getDataTagSchema.shape,
+    async (params) => ({ content: [{ type: "text", text: await handleGetDataTag(params) }] }),
+  );
+
+  server.tool(
+    "get_data_tag_fields",
+    "Получить поля аналитики Planfix.",
+    getDataTagFieldsSchema.shape,
+    async (params) => ({ content: [{ type: "text", text: await handleGetDataTagFields(params) }] }),
+  );
+
+  server.tool(
+    "get_data_tag_entry",
+    "Получить запись аналитики Planfix по ключу.",
+    getDataTagEntrySchema.shape,
+    async (params) => ({ content: [{ type: "text", text: await handleGetDataTagEntry(params) }] }),
+  );
+
+  server.tool(
+    "get_data_tag_entries",
+    "Получить записи аналитики Planfix с фильтрами, включая taskId/contactId.",
+    getDataTagEntriesSchema.shape,
+    async (params) => ({ content: [{ type: "text", text: await handleGetDataTagEntries(params) }] }),
+  );
+
+  server.tool(
+    "get_task_actual_work_time",
+    "Получить записи аналитики фактического времени по задаче и расчетную сводку.",
+    getTaskActualWorkTimeSchema.shape,
+    async (params) => ({ content: [{ type: "text", text: await handleGetTaskActualWorkTime(params) }] }),
+  );
+
   skillMyTasks(server);
   skillCreateTask(server);
 
@@ -164,7 +220,7 @@ async function main(): Promise<void> {
     const server = createPlanfixServer();
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error(`[planfix-mcp] v${VERSION} запущен. 10 инструментов, 2 навыка. Stdio.`);
+    console.error(`[planfix-mcp] v${VERSION} запущен. 16 инструментов, 2 навыка. Stdio.`);
   }
 }
 

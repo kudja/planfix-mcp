@@ -92,11 +92,13 @@ npx -y @smithery/cli install @theyahia/planfix-mcp --client claude
 |-----------|-------------|----------|
 | `PLANFIX_API_KEY` | Да | API-ключ. Получите: Настройки > Интеграции > API |
 | `PLANFIX_ACCOUNT` | Рекомендуется | Субдомен (например `mycompany` из `mycompany.planfix.com`) |
+| `PLANFIX_DOMAIN` | Нет | Домен Planfix, например `planfix.ru` для российских аккаунтов. По умолчанию `planfix.com` |
+| `PLANFIX_BASE_URL` | Нет | Полный REST URL, например `https://mycompany.planfix.ru/rest`. Имеет приоритет над `PLANFIX_ACCOUNT` |
 | `PLANFIX_TOKEN` | Нет | Устаревший вариант, используйте `PLANFIX_API_KEY` |
 
-Base URL: `https://{PLANFIX_ACCOUNT}.planfix.com/rest/` (если `PLANFIX_ACCOUNT` задан).
+Base URL: `https://{PLANFIX_ACCOUNT}.{PLANFIX_DOMAIN}/rest/` (если `PLANFIX_ACCOUNT` задан).
 
-## Инструменты (10)
+## Инструменты (16)
 
 | Инструмент | Описание |
 |------------|----------|
@@ -110,6 +112,12 @@ Base URL: `https://{PLANFIX_ACCOUNT}.planfix.com/rest/` (если `PLANFIX_ACCOU
 | `get_project` | Один проект по ID |
 | `get_comments` | Комментарии к задаче |
 | `add_comment` | Добавить комментарий к задаче |
+| `get_data_tags` | Список аналитик Planfix с пагинацией |
+| `get_data_tag` | Одна аналитика по ID |
+| `get_data_tag_fields` | Поля аналитики |
+| `get_data_tag_entry` | Запись аналитики по ключу |
+| `get_data_tag_entries` | Записи аналитики с фильтрами, включая `taskId`/`contactId` |
+| `get_task_actual_work_time` | Записи фактического времени по задаче и расчетная сводка |
 
 ## Навыки (Skills / Prompts) (2)
 
@@ -126,13 +134,48 @@ Base URL: `https://{PLANFIX_ACCOUNT}.planfix.com/rest/` (если `PLANFIX_ACCOU
 Список контактов
 Покажи проекты
 Добавь комментарий к задаче 456: "Готово"
+Покажи поля аналитики 28008
+Покажи фактическое время по задаче 20795
+```
+
+### Аналитики и фактическое время
+
+`get_task` с полем `dataTags` показывает только привязанные аналитики и ключи записей. Чтобы прочитать значения записей, используйте инструменты `datatag/entry`.
+
+Для аналитики "Фактическое время работы" в аккаунте MageAssist используется `dataTagId = 28008`. Helper `get_task_actual_work_time` использует этот ID по умолчанию, возвращает исходные записи Planfix в `raw` и добавляет `summary`, если поле времени можно надежно распознать.
+
+Примеры:
+
+```json
+{
+  "tool": "get_data_tag_fields",
+  "arguments": { "dataTagId": 28008 }
+}
+```
+
+```json
+{
+  "tool": "get_data_tag_entries",
+  "arguments": {
+    "dataTagId": 28008,
+    "taskId": 20795,
+    "fields": "dataTag,key,commentId,task,contact"
+  }
+}
+```
+
+```json
+{
+  "tool": "get_task_actual_work_time",
+  "arguments": { "taskId": 20795 }
+}
 ```
 
 ## Разработка
 
 ```bash
 npm install
-npm test        # Vitest (17 тестов)
+npm test        # Vitest
 npm run dev     # tsx watch
 npm run build   # TypeScript compile
 ```
