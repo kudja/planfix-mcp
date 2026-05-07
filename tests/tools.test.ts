@@ -234,4 +234,62 @@ describe("datatags tools", () => {
     expect(result.summary.totalMinutes).toBeNull();
     expect(result.summary.warning).toContain("Не удалось");
   });
+
+  it("handleGetTaskActualWorkTime fetches all pages", async () => {
+    mockPost
+      .mockResolvedValueOnce({
+        dataTagEntries: [
+          {
+            key: 1,
+            customFieldData: [
+              {
+                field: { id: 106948, name: "Время работы:", type: 6 },
+                value: { from: { time: "10:00" }, to: { time: "11:00" } },
+              },
+            ],
+          },
+          {
+            key: 2,
+            customFieldData: [
+              {
+                field: { id: 106948, name: "Время работы:", type: 6 },
+                value: { from: { time: "12:00" }, to: { time: "13:30" } },
+              },
+            ],
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        dataTagEntries: [
+          {
+            key: 3,
+            customFieldData: [
+              {
+                field: { id: 106948, name: "Время работы:", type: 6 },
+                value: { from: { time: "15:00" }, to: { time: "15:45" } },
+              },
+            ],
+          },
+        ],
+      });
+
+    const { handleGetTaskActualWorkTime } = await import("../src/tools/datatags.js");
+    const result = JSON.parse(await handleGetTaskActualWorkTime({ taskId: 20795, pageSize: 2 }));
+
+    expect(mockPost).toHaveBeenNthCalledWith(1, "datatag/28008/entry/list", {
+      offset: 0,
+      pageSize: 2,
+      fields: "dataTag,key,commentId,task,contact,106950,106948,106944,106946,109380,109386",
+      taskId: 20795,
+    });
+    expect(mockPost).toHaveBeenNthCalledWith(2, "datatag/28008/entry/list", {
+      offset: 2,
+      pageSize: 2,
+      fields: "dataTag,key,commentId,task,contact,106950,106948,106944,106946,109380,109386",
+      taskId: 20795,
+    });
+    expect(result.summary.totalMinutes).toBe(195);
+    expect(result.raw.dataTagEntries).toHaveLength(3);
+    expect(result.raw.pagesFetched).toBe(2);
+  });
 });

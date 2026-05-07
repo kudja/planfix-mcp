@@ -112,7 +112,7 @@ export const getTaskActualWorkTimeSchema = z.object({
 export async function handleGetTaskActualWorkTime(params: z.infer<typeof getTaskActualWorkTimeSchema>): Promise<string> {
   const dataTagId = params.dataTagId ?? ACTUAL_WORK_TIME_DATA_TAG_ID;
   const fields = params.fields ?? (dataTagId === ACTUAL_WORK_TIME_DATA_TAG_ID ? ACTUAL_WORK_TIME_FIELDS : DEFAULT_ENTRY_FIELDS);
-  const raw = await fetchDataTagEntries({
+  const raw = await fetchAllDataTagEntries({
     dataTagId,
     taskId: params.taskId,
     offset: params.offset,
@@ -143,6 +143,34 @@ async function fetchDataTagEntries(params: z.infer<typeof getDataTagEntriesSchem
   if (params.filters !== undefined) body.filters = params.filters;
 
   return planfixPost(`datatag/${params.dataTagId}/entry/list`, body);
+}
+
+async function fetchAllDataTagEntries(params: z.infer<typeof getDataTagEntriesSchema>): Promise<unknown> {
+  const pageSize = Math.min(params.pageSize ?? 100, 100);
+  let offset = params.offset ?? 0;
+  let pagesFetched = 0;
+  let firstPage: EntriesResponse | undefined;
+  const allEntries: DataTagEntry[] = [];
+
+  while (true) {
+    const page = await fetchDataTagEntries({ ...params, offset, pageSize }) as EntriesResponse;
+    if (!firstPage) firstPage = page;
+
+    const entries = extractEntries(page);
+    allEntries.push(...entries);
+    pagesFetched += 1;
+
+    if (entries.length < pageSize || pageSize <= 0) break;
+    offset += pageSize;
+  }
+
+  return {
+    ...(firstPage ?? {}),
+    dataTagEntries: allEntries,
+    offset: params.offset ?? 0,
+    pageSize,
+    pagesFetched,
+  };
 }
 
 function summarizeActualWorkTime(raw: unknown): TimeSummary {
