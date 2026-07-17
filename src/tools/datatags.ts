@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { planfixGet, planfixPost } from "../client.js";
+import { formatDatatagList } from "../format.js";
 
 const DEFAULT_DATA_TAG_FIELDS = "id,name,group,fields";
 const DEFAULT_ENTRY_FIELDS = "dataTag,key,commentId,task,contact";
@@ -51,6 +52,18 @@ export async function handleGetDataTags(params: z.infer<typeof getDataTagsSchema
     fields: params.fields ?? DEFAULT_DATA_TAG_FIELDS,
   });
   return JSON.stringify(result, null, 2);
+}
+
+
+export const listDatatagsSchema = getDataTagsSchema;
+
+export async function handleListDatatags(params: z.infer<typeof listDatatagsSchema>): Promise<string> {
+  const result = await planfixPost("datatag/list", {
+    offset: params.offset ?? 0,
+    pageSize: params.pageSize ?? 100,
+    fields: params.fields ?? "id,name",
+  });
+  return formatDatatagList(result);
 }
 
 export const getDataTagSchema = z.object({
