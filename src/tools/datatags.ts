@@ -4,10 +4,6 @@ import { formatDatatagList } from "../format.js";
 
 const DEFAULT_DATA_TAG_FIELDS = "id,name,group,fields";
 const DEFAULT_ENTRY_FIELDS = "dataTag,key,commentId,task,contact";
-const ACTUAL_WORK_TIME_DATA_TAG_ID = 28008;
-const ACTUAL_WORK_TIME_FIELDS =
-  "dataTag,key,commentId,task,contact,106950,106948,106944,106946,109380,109386";
-
 const dataTagFilterSchema = z.record(z.unknown());
 
 type CustomFieldValue = {
@@ -116,26 +112,24 @@ export async function handleGetDataTagEntries(params: z.infer<typeof getDataTagE
 
 export const getTaskActualWorkTimeSchema = z.object({
   taskId: z.number().describe("ID задачи"),
-  dataTagId: z.number().optional().describe("ID аналитики фактического времени (по умолчанию 28008)"),
+  dataTagId: z.number().describe("ID аналитики фактического времени"),
   offset: z.number().optional().describe("Смещение для пагинации (по умолчанию 0)"),
   pageSize: z.number().optional().describe("Количество записей на странице (по умолчанию 100)"),
-  fields: z.string().optional().describe("Поля записей аналитики через запятую"),
+  fields: z.string().optional().describe("Поля записей аналитики через запятую; добавьте ID полей со временем для расчета summary"),
 });
 
 export async function handleGetTaskActualWorkTime(params: z.infer<typeof getTaskActualWorkTimeSchema>): Promise<string> {
-  const dataTagId = params.dataTagId ?? ACTUAL_WORK_TIME_DATA_TAG_ID;
-  const fields = params.fields ?? (dataTagId === ACTUAL_WORK_TIME_DATA_TAG_ID ? ACTUAL_WORK_TIME_FIELDS : DEFAULT_ENTRY_FIELDS);
   const raw = await fetchAllDataTagEntries({
-    dataTagId,
+    dataTagId: params.dataTagId,
     taskId: params.taskId,
     offset: params.offset,
     pageSize: params.pageSize,
-    fields,
+    fields: params.fields ?? DEFAULT_ENTRY_FIELDS,
   });
 
   return JSON.stringify(
     {
-      dataTagId,
+      dataTagId: params.dataTagId,
       taskId: params.taskId,
       summary: summarizeActualWorkTime(raw),
       raw,

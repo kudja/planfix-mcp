@@ -169,7 +169,7 @@ Base URL: `https://{PLANFIX_ACCOUNT}.{PLANFIX_HOST}/rest/`. Авторизаци
 Список контактов
 Покажи проекты
 Добавь комментарий к задаче 456: "Готово"
-Покажи поля аналитики 28008
+Покажи поля аналитики 12345
 Покажи фактическое время по задаче 20795
 ```
 
@@ -177,14 +177,14 @@ Base URL: `https://{PLANFIX_ACCOUNT}.{PLANFIX_HOST}/rest/`. Авторизаци
 
 `get_task` с полем `dataTags` показывает только привязанные аналитики и ключи записей. Чтобы прочитать значения записей, используйте инструменты `datatag/entry`.
 
-Для аналитики "Фактическое время работы" в аккаунте MageAssist используется `dataTagId = 28008`. Helper `get_task_actual_work_time` использует этот ID по умолчанию, возвращает исходные записи Planfix в `raw` и добавляет `summary`, если поле времени можно надежно распознать.
+Для аналитики "Фактическое время работы" передайте ID аналитики вашего аккаунта в `dataTagId`. Helper `get_task_actual_work_time` возвращает исходные записи Planfix в `raw` и добавляет `summary`, если поле времени можно надежно распознать.
 
 Примеры:
 
 ```json
 {
   "tool": "get_data_tag_fields",
-  "arguments": { "dataTagId": 28008 }
+  "arguments": { "dataTagId": 12345 }
 }
 ```
 
@@ -192,7 +192,7 @@ Base URL: `https://{PLANFIX_ACCOUNT}.{PLANFIX_HOST}/rest/`. Авторизаци
 {
   "tool": "get_data_tag_entries",
   "arguments": {
-    "dataTagId": 28008,
+    "dataTagId": 12345,
     "taskId": 20795,
     "fields": "dataTag,key,commentId,task,contact"
   }
@@ -202,7 +202,11 @@ Base URL: `https://{PLANFIX_ACCOUNT}.{PLANFIX_HOST}/rest/`. Авторизаци
 ```json
 {
   "tool": "get_task_actual_work_time",
-  "arguments": { "taskId": 20795 }
+  "arguments": {
+    "taskId": 20795,
+    "dataTagId": 12345,
+    "fields": "dataTag,key,commentId,task,contact,106950"
+  }
 }
 ```
 

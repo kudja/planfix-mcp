@@ -232,7 +232,11 @@ describe("datatags tools", () => {
       ],
     });
     const { handleGetTaskActualWorkTime } = await import("../src/tools/datatags.js");
-    const result = JSON.parse(await handleGetTaskActualWorkTime({ taskId: 20795 }));
+    const result = JSON.parse(await handleGetTaskActualWorkTime({
+      taskId: 20795,
+      dataTagId: 28008,
+      fields: "dataTag,key,commentId,task,contact,106950,106948,106944,106946,109380,109386",
+    }));
     expect(mockPost).toHaveBeenCalledWith("datatag/28008/entry/list", {
       offset: 0,
       pageSize: 100,
@@ -260,7 +264,11 @@ describe("datatags tools", () => {
       ],
     });
     const { handleGetTaskActualWorkTime } = await import("../src/tools/datatags.js");
-    const result = JSON.parse(await handleGetTaskActualWorkTime({ taskId: 20795 }));
+    const result = JSON.parse(await handleGetTaskActualWorkTime({
+      taskId: 20795,
+      dataTagId: 28008,
+      fields: "dataTag,key,commentId,task,contact,106950,106948,106944,106946,109380,109386",
+    }));
     expect(result.summary.totalMinutes).toBe(220);
     expect(result.summary.totalHours).toBe(3.67);
   });
@@ -270,7 +278,7 @@ describe("datatags tools", () => {
       entries: [{ key: 1, customFieldData: [{ field: { id: 10, name: "Описание" }, value: "text" }] }],
     });
     const { handleGetTaskActualWorkTime } = await import("../src/tools/datatags.js");
-    const result = JSON.parse(await handleGetTaskActualWorkTime({ taskId: 20795 }));
+    const result = JSON.parse(await handleGetTaskActualWorkTime({ taskId: 20795, dataTagId: 28008 }));
     expect(result.summary.totalMinutes).toBeNull();
     expect(result.summary.warning).toContain("Не удалось");
   });
@@ -314,7 +322,12 @@ describe("datatags tools", () => {
       });
 
     const { handleGetTaskActualWorkTime } = await import("../src/tools/datatags.js");
-    const result = JSON.parse(await handleGetTaskActualWorkTime({ taskId: 20795, pageSize: 2 }));
+    const result = JSON.parse(await handleGetTaskActualWorkTime({
+      taskId: 20795,
+      dataTagId: 28008,
+      pageSize: 2,
+      fields: "dataTag,key,commentId,task,contact,106950,106948,106944,106946,109380,109386",
+    }));
 
     expect(mockPost).toHaveBeenNthCalledWith(1, "datatag/28008/entry/list", {
       offset: 0,
