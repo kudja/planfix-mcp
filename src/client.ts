@@ -5,9 +5,6 @@ const MAX_RETRIES = 3;
 const RATE_LIMIT_CODE = 22;
 
 function getBaseUrl(): string {
-  const baseUrl = process.env.PLANFIX_BASE_URL;
-  if (baseUrl) return baseUrl.replace(/\/+$/, "");
-
   const account = process.env.PLANFIX_ACCOUNT;
   if (!account) {
     throw new Error(
@@ -16,7 +13,7 @@ function getBaseUrl(): string {
     );
   }
   // Allow a custom host suffix for regional installs (e.g. PLANFIX_HOST=planfix.ru).
-  const host = process.env.PLANFIX_HOST || process.env.PLANFIX_DOMAIN || "planfix.com";
+  const host = process.env.PLANFIX_HOST || "planfix.com";
   return `https://${account}.${host}/rest`;
 }
 
