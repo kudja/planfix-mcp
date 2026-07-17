@@ -95,8 +95,6 @@ npx -y @smithery/cli install @theyahia/planfix-mcp --client claude
 | `PLANFIX_API_KEY` | Да | API-ключ. Создаётся в Управлении аккаунтом → Доступ к API → REST API |
 | `PLANFIX_ACCOUNT` | **Да** | Субдомен (например `mycompany` из `mycompany.planfix.com`). Обязателен — общего хоста у REST API нет |
 | `PLANFIX_HOST` | Нет | Хост для региональных инсталляций (по умолчанию `planfix.com`; например `planfix.ru`) |
-| `PLANFIX_DOMAIN` | Нет | Устаревший alias для `PLANFIX_HOST`, оставлен для совместимости |
-| `PLANFIX_BASE_URL` | Нет | Полный REST URL, например `https://mycompany.planfix.ru/rest`. Имеет приоритет над `PLANFIX_ACCOUNT` |
 | `PLANFIX_TOKEN` | Нет | Устаревший вариант, используйте `PLANFIX_API_KEY` |
 
 Base URL: `https://{PLANFIX_ACCOUNT}.{PLANFIX_HOST}/rest/`. Авторизация — заголовок `Authorization: Bearer <key>`.

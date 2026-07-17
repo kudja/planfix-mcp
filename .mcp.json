@@ -1,11 +1,12 @@
 {
   "mcpServers": {
     "planfix": {
-      "command": "npx",
-      "args": ["-y", "@theyahia/planfix-mcp"],
+      "command": "npm",
+      "args": ["start"],
       "env": {
         "PLANFIX_API_KEY": "",
-        "PLANFIX_ACCOUNT": ""
+        "PLANFIX_ACCOUNT": "",
+        "PLANFIX_HOST": "planfix.ru"
       }
     }
   }
